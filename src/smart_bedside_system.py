@@ -27,6 +27,7 @@ class SmartBedsideSystem:
         self.spo2_hr_sensor.sensor_start_collect()
 
         GPIO.setup(self.BUZZER_PIN, GPIO.OUT)
+        GPIO.setup(self.BUTTON_PIN, GPIO.IN)
 
         self.alarm_on = False
 
@@ -64,7 +65,11 @@ class SmartBedsideSystem:
         """
         Stop the alarm if the pushbutton is pressed. Otherwise, leave the alarm unchanged.
         """
-        # See User Story #3.
+        button_pressed = GPIO.input(self.BUTTON_PIN)
+
+        if button_pressed:
+            GPIO.output(self.BUZZER_PIN, False)
+            self.alarm_on = False
 
     def set_o2_valve_angle(self, angle: float) -> None:
         """
