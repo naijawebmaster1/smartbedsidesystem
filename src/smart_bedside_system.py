@@ -19,15 +19,16 @@ class SmartBedsideSystem:
     O2_SERVO_PIN = 12  # MG90S servo motor controlling the oxygen delivery valve (see User Story #4).
 
     def __init__(self):
-        GPIO.setmode(GPIO.BOARD)  # Refer to the GPIO pins by their physical number on the board.
-        GPIO.setwarnings(False)  # Disable warnings.
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setwarnings(False)
 
-        self.spo2_hr_sensor = None  # Replace None by initializing the MAX30102 sensor (see User Story #1).
+        self.spo2_hr_sensor = DFRobot_BloodOxygen_S()
+        self.spo2_hr_sensor.begin()
+        self.spo2_hr_sensor.sensor_start_collect()
 
-        self.alarm_on = None  # Replace None by initializing the alarm status (see User Story #2).
-
-        self.o2_servo = None  # Replace None by initializing the servo motor's PWM instance (see User Story #4).
-        self.o2_valve_angle = None  # Replace None by initializing the valve angle, in degrees (see User Story #4).
+        self.alarm_on = None
+        self.o2_servo = None
+        self.o2_valve_angle = None
 
     def read_vital_signs(self) -> int:
         """
@@ -35,7 +36,12 @@ class SmartBedsideSystem:
         Returns: int: SpO₂ percentage (70–100).
         Raises: SmartBedsideError: If the sensor returns an invalid reading (-1).
         """
-        # See User Story #1.
+        spo2 = self.spo2_hr_sensor.get_spo2()
+
+        if spo2 == -1:
+            raise SmartBedsideError()
+
+        return spo2
 
     def manage_alarm(self) -> None:
         """
